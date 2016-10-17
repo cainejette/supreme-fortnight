@@ -1,2 +1,2 @@
 # xkcd
-it's like gyphy for xkcd
+it's like giphy but for xkcd
