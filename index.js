@@ -64,6 +64,7 @@ var send = (res, data) => {
   var comic = JSON.parse(data);
 
   var response = {
+    'response_type': 'in_channel',
     'attachments': [
       {
         'title': comic.title,
