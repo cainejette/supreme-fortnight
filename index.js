@@ -44,37 +44,46 @@ var getRandomComic = (res) => {
 };
 
 var getRelevantComic = (res, query) => {
-  google('xkcd ' + query, (err, data) => {
+  google(query + ' +xkcd', (err, data) => {
     if (err) {
+      console.log('query failed!');
       handleError(res, err);
     }
 
-    var link = data.links[0].href + '/info.0.json';
-    curl.request(link, (err2, data2) => {
-      if (err2) {
-        handleError(res, err2);
-      }
+    if (data.links[0].href.indexOf('https://xkcd.com') != 0) {
+      getRandomComic(res);
+    } else {
+      var link = data.links[0].href + '/info.0.json';
+      curl.request(link, (err2, data2) => {
+        if (err2) {
+          handleError(res, err2);
+        }
 
-      send(res, data2);
-    });
+        send(res, data2);
+      });
+    }
   });
 };
 
 var send = (res, data) => {
   var comic = JSON.parse(data);
 
-  var response = {
-    'response_type': 'in_channel',
-    'attachments': [
-      {
-        'title': comic.title,
-        'title_link': 'http://xkcd.com/' + comic.num,
-        'image_url': comic.img,
-        'footer': comic.alt,
-      }
-    ]
-  };
-  res.send(response);
+  if (comic.num != null) {
+    var response = {
+      'response_type': 'in_channel',
+      'attachments': [
+        {
+          'title': comic.title,
+          'title_link': 'http://xkcd.com/' + comic.num,
+          'image_url': comic.img,
+          'footer': comic.alt,
+        }
+      ]
+    };
+    res.send(response);
+  } else {
+    getRandomComic(res);
+  }
 }
 
 var handleError = (res, err) => {
