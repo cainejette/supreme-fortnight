@@ -44,13 +44,14 @@ var getRandomComic = (res) => {
 };
 
 var getRelevantComic = (res, query) => {
-  google(query + ' +xkcd', (err, data) => {
+  google('site:xkcd.com ' + query, (err, data) => {
     if (err) {
       console.log('query failed!');
       handleError(res, err);
     }
 
-    if (data.links[0].href.indexOf('https://xkcd.com') != 0) {
+    console.log('query returned: ', data.links[0]);
+    if (data.links[0].href.indexOf('xkcd.com') == -1) {
       getRandomComic(res);
     } else {
       var link = data.links[0].href + '/info.0.json';
@@ -67,7 +68,7 @@ var getRelevantComic = (res, query) => {
 
 var send = (res, data) => {
   var comic = JSON.parse(data);
-
+  console.dir(comic);
   if (comic.num != null) {
     var response = {
       'response_type': 'in_channel',
