@@ -8,6 +8,10 @@ app.get('/', function (req, res) {
   res.send('hi');
 });
 
+app.get('/go', function (req, res) {
+  getRandomComic(res);
+})
+
 app.listen(process.env.PORT || 8765, function () {
   console.log('started...');
 });
@@ -67,22 +71,28 @@ var getRelevantComic = (res, query) => {
 };
 
 var send = (res, data) => {
-  var comic = JSON.parse(data);
-  console.dir(comic);
-  if (comic.num != null) {
-    var response = {
-      'response_type': 'in_channel',
-      'attachments': [
-        {
-          'title': comic.title,
-          'title_link': 'http://xkcd.com/' + comic.num,
-          'image_url': comic.img,
-          'footer': comic.alt,
-        }
-      ]
-    };
-    res.send(response);
-  } else {
+  try {
+    var comic = JSON.parse(data);
+    console.dir(comic);
+    if (comic.num != null) {
+      var response = {
+        'response_type': 'in_channel',
+        'attachments': [
+          {
+            'title': comic.title,
+            'title_link': 'http://xkcd.com/' + comic.num,
+            'image_url': comic.img,
+            'footer': comic.alt,
+          }
+        ]
+      };
+      res.send(response);
+    } else {
+      getRandomComic(res);
+    }
+  }
+  catch(Exception) {
+    console.log('something bad happened!! trying a random comic');
     getRandomComic(res);
   }
 }
